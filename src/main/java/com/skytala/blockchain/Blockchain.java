@@ -1,7 +1,12 @@
 package com.skytala.blockchain;
 
+import java.net.URL;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import static com.skytala.infrastructure.Utils.*;
 
 /**
  Responsible for managing the chain. It will store transactions
@@ -19,7 +24,20 @@ public class Blockchain {
      * @return A new Block
      */
     public Block newBlock(Integer proof, String previousHash) {
-        return null;
+        if(previousHash==null)
+            previousHash = hash(chain.get(chain.size()-1));
+
+        Block block = new Block();
+        block.setIndex(chain.size());
+        block.setTimestamp(time());
+        block.setProof(proof);
+        block.setPreviousHash(previousHash);
+        block.setTransactions(currentTransactions);
+
+        currentTransactions = new LinkedList<>();//<-|Reset the current
+        chain.add(block);                        //  |list of transactions
+
+        return block;
     }
 
     public Block newBlock(Integer proof) {
@@ -36,11 +54,12 @@ public class Blockchain {
      * @return The indes of the Block that will hold this transaction
      */
     public Integer newTransaction(String sender, String recipient, Integer amount) {
-        return null;
+        return newTransaction(new Transaction(sender, recipient, amount));
     }
 
     public Integer newTransaction(Transaction transaction) {
-        return null;
+        currentTransactions.add(transaction);
+        return lastIndex();
     }
 
     /**
@@ -50,10 +69,17 @@ public class Blockchain {
      * @return The SHA-256 Hash of this Block
      */
     public String hash(Block block) {
-        return null;
+        String blockString = asJson(block);
+        return sha256(blockString);
     }
 
     public Block lastBlock() {
-        return null;
+        if(chain.size() == 0)
+            return null;
+        return chain.get(lastIndex());
+    }
+
+    public Integer lastIndex() {
+        return chain.size() - 1;
     }
 }
