@@ -63,6 +63,39 @@ public class Blockchain {
     }
 
     /**
+     * Simple Proof of Work Algorithm:
+     * - Find a number p' such that hash(pp') contains leading
+     *   4 zeroes, where p is the previous p'
+     * - p is the previous proof, and p' is the new proof
+     * @param lastProof
+     * @return the new proof
+     */
+    public static Integer proofOfWork(Integer lastProof) {
+        Integer proof = 0;
+        while(!validProof(lastProof, proof))
+            proof += 1;
+        return proof;
+    }
+
+    /**
+     * Validates the Proof: Does hash(last_proof, proof) contain
+     * 4 leading zeroes?
+     * @param lastProof Previous Proof
+     * @param proof Current Proof
+     * @return True if correct, False if not
+     */
+    private static boolean validProof(Integer lastProof, Integer proof) {
+        String guessHash = lastProof.toString()+proof.toString();
+        return guessHash.endsWith("0000");
+        /*
+        To adjust the difficulty of the algorithm, we could modify the
+        number of leading zeroes. But 4 is sufficient.
+        You’ll find out that the addition of a single leading zero makes
+        a mammoth difference to the time required to find a solution.
+         */
+    }
+
+    /**
      * Creates a SHA-256 hash of a Block, encodes as
      * JSON and then Hashed
      * @param block Block
