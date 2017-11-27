@@ -1,6 +1,7 @@
 package com.skytala.blockchain;
 
 import com.skytala.blockchain.message.MiningMessage;
+import com.skytala.blockchain.message.ResolveMessage;
 import com.skytala.blockchain.message.TransactionAddedMessage;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,4 +64,24 @@ public class BlockchainApi {
         return new Chain(blockchain.getChain());
     }
 
+    @PostMapping("/nodes/register")
+    public String registerNodes(@Valid @RequestBody Node node) {
+        blockchain.registerNode(node);
+        return "New node has been added";
+    }
+
+    /**
+     * Runs through all registered nodes and resolves the conflicts
+     * This is the starting point of the consensus algorithm:
+     * If an longer chain is found at the neighbours than the own chain
+     * is replaced by this
+     */
+    @GetMapping("/nodes/resolve")
+    public ResolveMessage consensus() {
+        Boolean replaced = blockchain.resolveConflicts();
+        if(replaced)
+            return new ResolveMessage("Our chain was replaced", blockchain.getChain());
+        else
+            return new ResolveMessage("Our chain is authoritative", blockchain.getChain());
+    }
 }

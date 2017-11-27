@@ -1,7 +1,10 @@
 package com.skytala.infrastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.skytala.blockchain.Chain;
+import com.skytala.blockchain.Node;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -10,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -58,6 +62,30 @@ public class Utils {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    public static Chain readChain(URL url, String route) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(concat(url, route), Chain.class);
+        } catch (IOException e) {
+            System.err.println(url);
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static List<Node> readNodes(URL url, String route) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(concat(url, route), new TypeReference<List<Node>>(){});
+        } catch (IOException e) {
+            System.err.println(url);
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private static URL concat(URL url, String route) {

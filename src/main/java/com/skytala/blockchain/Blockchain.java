@@ -16,6 +16,7 @@ public class Blockchain {
 
     private List<Block> chain = new LinkedList<>();
     private List<Transaction> currentTransactions = new LinkedList<>();
+    private Set<Node> nodes = new HashSet<>();
 
     /**
      * Create a new Block in the Blockchain
@@ -122,5 +123,88 @@ public class Blockchain {
 
     public List<Transaction> getCurrentTransactions() {
         return currentTransactions;
+    }
+
+    /**
+     * Add a new node to the list of nodes
+     * @param address Address of node. Eg. 'http://192.168.0.5:5000'
+     */
+    public void registerNode(URL address) {
+        registerNode(new Node(address));
+    }
+
+    public void registerNode(Node node) {
+        this.nodes.add(node);
+    }
+
+    /**
+     * Determine if a given blockchain is valid
+     * A conflict is when one node has a different chain to another node.
+     * To resolve this, we’ll make the rule that the longest valid
+     * chain is authoritative. In other words, the longest chain on the network
+     * is the de-facto one. Using this algorithm, we reach Consensus amongst the
+     * nodes in our network.
+     * @param chain A blockchain
+     * @return True if valid, False if not
+     */
+    public boolean validChain(List<Block> chain) {
+        Block lastBlock = chain.get(0);
+        Integer currentIndex = 1;
+
+        // Check the whole chain, if the block<->hash valid
+        while(currentIndex < chain.size()) {
+            Block block = chain.get(currentIndex);
+            System.out.println("Last Block: "+lastBlock);
+            System.out.println("Block: "+ block);
+            System.out.println("-----");
+
+
+            // Check that the hash of the block is correct
+            if(!block.getPreviousHash().equals(hash(lastBlock)))
+                return false;
+
+            // check that the Proof of Work is correct
+            if(!validProof(lastBlock.getProof(), block.getProof()) )
+                return false;
+
+            lastBlock = block;
+            currentIndex += 1;
+        }
+        return true;
+    }
+
+    /**
+     * This is our Consensus Algorithm, it resolves conflicts
+     * by replacing our chain with the longest one in the network.
+     * @return True if our chain was replaced, False if not
+     */
+    public boolean resolveConflicts() {
+        Set<Node> neighbours = nodes;
+        List<Block> newChain = new LinkedList<>();
+
+        // We are only looking for chains longer than ours
+        Integer maxLength = chain.size();
+
+        // Grab and verify the chains from all the nodes in our network
+        for(Node node : neighbours) {
+            Chain nodeChain = node.readChain();
+            if(nodeChain != null) {
+                Integer length = nodeChain.getLength();
+                List<Block> chain = nodeChain.getChain();
+
+                if(length > maxLength && validChain(chain)) {
+                    maxLength = length;
+                    newChain = chain;
+                }
+            }
+        }
+
+        // Replace our chain if we discovered a new, valid chain longer than ours
+        if(!newChain.isEmpty()) {
+            this.chain = newChain;
+            return true;
+        }
+
+        return false;
     }
 }
