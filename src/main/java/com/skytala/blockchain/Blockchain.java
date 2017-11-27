@@ -115,4 +115,12 @@ public class Blockchain {
     public Integer lastIndex() {
         return chain.size() - 1;
     }
+
+    public List<Block> getChain() {
+        return chain;
+    }
+
+    public List<Transaction> getCurrentTransactions() {
+        return currentTransactions;
+    }
 }
