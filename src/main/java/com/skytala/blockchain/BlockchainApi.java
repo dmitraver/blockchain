@@ -31,12 +31,26 @@ public class BlockchainApi {
      */
     @GetMapping("/mine")
     public MiningMessage mine() {
-        return null;
+        // We run the proof of work algorithm to get the next proof...
+        Block lastBlock = blockchain.lastBlock();
+        Integer lastProof = blockchain.lastIndex();
+        Integer proof = Blockchain.proofOfWork(lastProof);
+
+        // We must receive a reward for finding the proof
+        // The sender is "0" to signify that this node has mined a new coin
+        blockchain.newTransaction("0", nodeIdentifier, 1);
+
+        // Forge the new Block by adding it to the chain
+        String previousHash = blockchain.hash(lastBlock);
+        Block block = blockchain.newBlock(proof, previousHash);
+
+        return new MiningMessage("New Block Forged", block);
     }
 
     @PostMapping("/transactions/new")
     public TransactionAddedMessage newTransaction(@Valid @RequestBody Transaction transaction) {
-        return null;
+        Integer index = blockchain.newTransaction(transaction);
+        return TransactionAddedMessage.of("Transaction will be added to Block "+index);
     }
 
     /**
