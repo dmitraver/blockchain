@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
 
 import static com.skytala.infrastructure.Utils.randomName;
 
@@ -32,6 +34,10 @@ public class BlockchainApi {
      */
     @GetMapping("/mine")
     public MiningMessage mine() {
+        // First of all get in sync (as good as possible with the network, so that
+        // it becomes more likely that our block get accepted
+        blockchain.resolveConflicts();
+
         // We run the proof of work algorithm to get the next proof...
         Block lastBlock = blockchain.lastBlock();
         Integer lastProof = blockchain.lastIndex();
@@ -44,6 +50,11 @@ public class BlockchainApi {
         // Forge the new Block by adding it to the chain
         String previousHash = blockchain.hash(lastBlock);
         Block block = blockchain.newBlock(proof, previousHash);
+
+        // The others must be notified, if a new block is mined, otherwise
+        // the block will not accepted by the network
+        for(Node node : blockchain.getNodes())
+            node.resolveConflicts();
 
         return new MiningMessage("New Block Forged", block);
     }
@@ -71,6 +82,23 @@ public class BlockchainApi {
     }
 
     /**
+     * Copies all neighbours of the given node
+     * Good, when entering the network so neighbours can easily collected
+     * @param nodeToCopy The node, which neighbours will be downloaded and copied
+     * @return An information, if it was successful (for display to the user)
+     */
+    @PostMapping("/nodes/copy")
+    public String copyNode(@Valid @RequestBody Node nodeToCopy) {
+        blockchain.registerNode(nodeToCopy);
+        List<Node> nodesToAdd = nodeToCopy.readNeigbours();
+        if(nodesToAdd == null)
+            return "Could not fetch nodes";
+        for(Node node : nodesToAdd)
+            blockchain.registerNode(node);
+        return nodesToAdd.size() + " Nodes added";
+    }
+
+    /**
      * Runs through all registered nodes and resolves the conflicts
      * This is the starting point of the consensus algorithm:
      * If an longer chain is found at the neighbours than the own chain
@@ -83,5 +111,14 @@ public class BlockchainApi {
             return new ResolveMessage("Our chain was replaced", blockchain.getChain());
         else
             return new ResolveMessage("Our chain is authoritative", blockchain.getChain());
+    }
+
+    /**
+     * Returns all registered nodes on this blockchain node as json
+     * @return all nodes for this blockchain
+     */
+    @GetMapping("/nodes/all")
+    public Set<Node> allNodes() {
+        return blockchain.getNodes();
     }
 }

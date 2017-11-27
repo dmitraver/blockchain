@@ -207,4 +207,8 @@ public class Blockchain {
 
         return false;
     }
+
+    public Set<Node> getNodes() {
+        return nodes;
+    }
 }
