@@ -2,7 +2,6 @@ package com.skytala.blockchain.message;
 
 import com.skytala.blockchain.Block;
 import com.skytala.blockchain.Transaction;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
@@ -17,14 +16,11 @@ public class MiningMessage {
     private String previousHash;
 
     public MiningMessage(String message, Block block) {
-       throw new NotImplementedException();
-       /*
        this.message = message;
         this.index = block.getIndex();
         this.transactions = block.getTransactions();
         this.proof = block.getProof();
         this.previousHash = block.getPreviousHash();
-        */
     }
 
     public String getMessage() {
