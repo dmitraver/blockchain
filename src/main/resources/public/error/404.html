@@ -1,133 +1,133 @@
 <html style="font-family: monospace;">
-    <body>
-        <h1>Hallo Bavarian Coding Group - Blockchain</h1>
-        <hr>
-        <h2>Aktonen abrufen</h2>
-        <ul>
-            <li><a href="/mine">Mine</a></li>
-            <li><a href="/chain">Chain</a></li>
-            <li><a href="/nodes/resolve">Consens</a></li>
-            <li><a href="/nodes/all">Nodes</a></li>
-        </ul>
-        <hr>
-        <h2>Neue Transaktion</h2>
-        <form method="POST" id="new_transaction" action="/transactions/new">
-            Meine Adresse:_ <input type="text" name="sender" /><br>
-            Empfänger:_____ <input type="text" name="recipient" /><br>
-            Menge:_________ <input type="number" name="amount" /><br>
-            _______________ <input type="submit" value="Transaktion durchführen"/>
-        </form>
-        <hr>
-        <h2>Node registrieren</h2>
-        <form method="POST" id="register_node" action="/nodes/register">
-            IP-Adresse:____ <input type="text" name="url" /><br>
-            _______________ <input type="submit" value="Node hinzufügen"/>
-        </form>
-        <hr>
-        <h2>Node von anderem Node übernehmen</h2>
-        <form method="POST" id="copy_from" action="/nodes/copy">
-            IP-Adresse:____ <input type="text" name="url" /><br>
-            _______________ <input type="submit" value="Nachbarn kopieren"/>
-        </form>
-        <script>
-            var forms = ["new_transaction", "register_node", "copy_from"]
-            var new_transaction_form = document.getElementById("new_transaction");
-            new_transaction_form.onsubmit = function (e) {
-                // stop the regular form submission
-                e.preventDefault();
+<body>
+<h1>Hello JUG</h1>
+<hr>
+<h2>Actions</h2>
+<ul>
+    <li><a href="/mine">Mine</a></li>
+    <li><a href="/chain">Chain</a></li>
+    <li><a href="/nodes/resolve">Consens</a></li>
+    <li><a href="/nodes/all">Nodes</a></li>
+</ul>
+<hr>
+<h2>Transactions</h2>
+<form method="POST" id="new_transaction" action="/transactions/new">
+    My Address:_____ <input type="text" name="sender" /><br>
+    Recipient:_____ <input type="text" name="recipient" /><br>
+    Amount:________ <input type="number" name="amount" /><br>
+    _______________ <input type="submit" value="Execute Transaction"/>
+</form>
+<hr>
+<h2>Register node</h2>
+<form method="POST" id="register_node" action="/nodes/register">
+    IP-Address:____ <input type="text" name="url" /><br>
+    + PORT_________ <input type="submit" value="Add node"/>
+</form>
+<hr>
+<h2>Read nodes from other node</h2>
+<form method="POST" id="copy_from" action="/nodes/copy">
+    IP-Address:____ <input type="text" name="url" /><br>
+    _______________ <input type="submit" value="Copy neighbours"/>
+</form>
+<script>
+    var forms = ["new_transaction", "register_node", "copy_from"]
+    var new_transaction_form = document.getElementById("new_transaction");
+    new_transaction_form.onsubmit = function (e) {
+        // stop the regular form submission
+        e.preventDefault();
 
-                // collect the form data while iterating over the inputs
-                var data = {};
-                for (var i = 0, ii = new_transaction_form.length; i < ii; ++i) {
-                    var input = new_transaction_form[i];
-                    if (input.name) {
-                        data[input.name] = input.value;
-                    }
-                }
+        // collect the form data while iterating over the inputs
+        var data = {};
+        for (var i = 0, ii = new_transaction_form.length; i < ii; ++i) {
+            var input = new_transaction_form[i];
+            if (input.name) {
+                data[input.name] = input.value;
+            }
+        }
 
-                // construct an HTTP request
-                var xhr = new XMLHttpRequest();
-                xhr.open(new_transaction_form.method, new_transaction_form.action, true);
-                xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        // construct an HTTP request
+        var xhr = new XMLHttpRequest();
+        xhr.open(new_transaction_form.method, new_transaction_form.action, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
-                // send the collected data as JSON
-                xhr.send(JSON.stringify(data));
+        // send the collected data as JSON
+        xhr.send(JSON.stringify(data));
 
-                xhr.onloadend = function (data) {
-                    try {
-                        alert(JSON.parse(data.target.responseText).message);
-                    } catch(e) {
-                        alert('Transaktion durchgeführt!');
-                    }
-
-
-                };
-            };
-
-            var register_node_form = document.getElementById("register_node");
-            register_node_form.onsubmit = function (e) {
-                // stop the regular form submission
-                e.preventDefault();
-
-                // collect the form data while iterating over the inputs
-                var data = {};
-                for (var i = 0, ii = register_node_form.length; i < ii; ++i) {
-                    var input = register_node_form[i];
-                    if (input.name) {
-                        data[input.name] = input.value;
-                    }
-                }
-
-                // construct an HTTP request
-                var xhr = new XMLHttpRequest();
-                xhr.open(register_node_form.method, register_node_form.action, true);
-                xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-
-                // send the collected data as JSON
-                xhr.send(JSON.stringify(data));
-
-                xhr.onloadend = function (data) {
-                    try {
-                        alert(JSON.parse(data.target.responseText).message);
-                    } catch(e) {
-                        alert('Ok!');
-                    }
-                };
-            };
-
-            var copy_from_form = document.getElementById("copy_from");
-            copy_from_form.onsubmit = function (e) {
-                // stop the regular form submission
-                e.preventDefault();
-
-                // collect the form data while iterating over the inputs
-                var data = {};
-                for (var i = 0, ii = copy_from_form.length; i < ii; ++i) {
-                    var input = copy_from_form[i];
-                    if (input.name) {
-                        data[input.name] = input.value;
-                    }
-                }
-
-                // construct an HTTP request
-                var xhr = new XMLHttpRequest();
-                xhr.open(copy_from_form.method, copy_from_form.action, true);
-                xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-
-                // send the collected data as JSON
-                xhr.send(JSON.stringify(data));
-
-                xhr.onloadend = function (data) {
-                    try {
-                        alert(JSON.parse(data.target.responseText).message);
-                    } catch(e) {
-                        alert('Ok');
-                    }
+        xhr.onloadend = function (data) {
+            try {
+                alert(JSON.parse(data.target.responseText).message);
+            } catch(e) {
+                alert('Transaktion durchgeführt!');
+            }
 
 
-                };
-            };
+        };
+    };
 
-        </script>
-    </body>
+    var register_node_form = document.getElementById("register_node");
+    register_node_form.onsubmit = function (e) {
+        // stop the regular form submission
+        e.preventDefault();
+
+        // collect the form data while iterating over the inputs
+        var data = {};
+        for (var i = 0, ii = register_node_form.length; i < ii; ++i) {
+            var input = register_node_form[i];
+            if (input.name) {
+                data[input.name] = input.value;
+            }
+        }
+
+        // construct an HTTP request
+        var xhr = new XMLHttpRequest();
+        xhr.open(register_node_form.method, register_node_form.action, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+        // send the collected data as JSON
+        xhr.send(JSON.stringify(data));
+
+        xhr.onloadend = function (data) {
+            try {
+                alert(JSON.parse(data.target.responseText).message);
+            } catch(e) {
+                alert('Ok!');
+            }
+        };
+    };
+
+    var copy_from_form = document.getElementById("copy_from");
+    copy_from_form.onsubmit = function (e) {
+        // stop the regular form submission
+        e.preventDefault();
+
+        // collect the form data while iterating over the inputs
+        var data = {};
+        for (var i = 0, ii = copy_from_form.length; i < ii; ++i) {
+            var input = copy_from_form[i];
+            if (input.name) {
+                data[input.name] = input.value;
+            }
+        }
+
+        // construct an HTTP request
+        var xhr = new XMLHttpRequest();
+        xhr.open(copy_from_form.method, copy_from_form.action, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+        // send the collected data as JSON
+        xhr.send(JSON.stringify(data));
+
+        xhr.onloadend = function (data) {
+            try {
+                alert(JSON.parse(data.target.responseText).message);
+            } catch(e) {
+                alert('Ok');
+            }
+
+
+        };
+    };
+
+</script>
+</body>
 </html>
