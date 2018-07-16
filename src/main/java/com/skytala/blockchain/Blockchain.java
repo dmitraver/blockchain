@@ -85,7 +85,7 @@ public class Blockchain {
      * @return True if correct, False if not
      */
     private static boolean validProof(Integer lastProof, Integer proof) {
-        String guessHash = lastProof.toString()+proof.toString();
+        String guessHash = sha256(lastProof.toString()+proof.toString());
         return guessHash.endsWith("0000");
         /*
         To adjust the difficulty of the algorithm, we could modify the
