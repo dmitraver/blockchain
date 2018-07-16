@@ -8,6 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableAutoConfiguration
 public class BlockchainApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(BlockchainApplication.class, args);
+		System.out.println("Hello World");
 	}
 }
