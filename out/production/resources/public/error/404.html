@@ -15,19 +15,19 @@
             My Adress:_____ <input type="text" name="sender" /><br>
             Recipient:_____ <input type="text" name="recipient" /><br>
             Amount:________ <input type="number" name="amount" /><br>
-            _______________ <input type="submit" value="Transaktion durchführen"/>
+            _______________ <input type="submit" value="Execute Transaction"/>
         </form>
         <hr>
         <h2>Register node</h2>
         <form method="POST" id="register_node" action="/nodes/register">
             IP-Address:____ <input type="text" name="url" /><br>
-            + PORT_________ <input type="submit" value="Node hinzufügen"/>
+            + PORT_________ <input type="submit" value="Add node"/>
         </form>
         <hr>
         <h2>Read nodes from other node</h2>
         <form method="POST" id="copy_from" action="/nodes/copy">
             IP-Address:____ <input type="text" name="url" /><br>
-            _______________ <input type="submit" value="Nachbarn kopieren"/>
+            _______________ <input type="submit" value="Copy neighbours"/>
         </form>
         <script>
             var forms = ["new_transaction", "register_node", "copy_from"]
